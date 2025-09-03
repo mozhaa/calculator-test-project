@@ -1,14 +1,20 @@
+from typing import Any
+
 from fastapi import APIRouter, FastAPI, Request, Response
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from .logic import calculate
 
 router = APIRouter()
 
+templates = Jinja2Templates(directory="client")
+
 
 @router.get("/")
-async def read_calculator(request: Request) -> FileResponse:
-    return FileResponse("client/index.html")
+async def read_calculator(request: Request) -> Any:
+    return templates.TemplateResponse(request=request, name="index.html")
 
 
 @router.post("/calculate")
@@ -22,4 +28,5 @@ async def calculate_expression(request: Request, expression: str) -> JSONRespons
 
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="client"), name="static")
 app.include_router(router)
