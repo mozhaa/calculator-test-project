@@ -132,30 +132,3 @@ def is_valid(tokens: list) -> bool:
         i += 1
 
     return True
-
-
-print(is_valid(get_tokens("1 + (1) + 1")))
-print(is_valid(get_tokens("()")))
-print(is_valid(get_tokens("(12)")))
-print(is_valid(get_tokens("(-12)")))
-print(is_valid(get_tokens(")")))
-print(is_valid(get_tokens("12()")))
-print(is_valid(get_tokens("1 + (12)")))
-print(is_valid(get_tokens("-1 + (12)")))
-print(is_valid(get_tokens("1 + (12) + ")))
-print(is_valid(get_tokens("1 + (12) + 1")))
-print(is_valid(get_tokens("1 + (12.0.0) + 1")))
-print(is_valid(get_tokens("1 + (.12) + 1")))
-
-print(get_tokens("1 + (1) + 1"))
-print(get_tokens("()"))
-print(get_tokens("(12)"))
-print(get_tokens("(-12)"))
-print(get_tokens(")"))
-print(get_tokens("12()"))
-print(get_tokens("1 + (12)"))
-print(get_tokens("-1 + (12)"))
-print(get_tokens("1 + (12) + "))
-print(get_tokens("1 + (12) + 1"))
-print(get_tokens("1 + (12.0.0) + 1"))
-print(get_tokens("1 + (.12) + 1"))
