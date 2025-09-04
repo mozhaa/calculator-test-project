@@ -92,9 +92,13 @@ class TestValidator(unittest.TestCase):
         # Минус в начале выражения
         self.assertTrue(is_valid(["-", "1", "+", "2"]))
         
-        # Минус после оператора
-        self.assertTrue(is_valid(["1", "+", "-", "2"]))
-        self.assertTrue(is_valid(["1", "*", "-", "2"]))
+        # Минус сразу после оператора нельзя
+        self.assertFalse(is_valid(["1", "+", "-", "2"]))
+        self.assertFalse(is_valid(["1", "*", "-", "2"]))
+
+        # Минус сразу после оператора со скобками можно
+        self.assertTrue(is_valid(["1", "+", "(", "-", "2", ")"]))
+        self.assertTrue(is_valid(["1", "*", "(", "-", "2", ")"]))
 
 if __name__ == '__main__':
     unittest.main()
