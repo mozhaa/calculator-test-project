@@ -17,6 +17,9 @@ def get_tokens(expression: str) -> list:
     token = ''
     i = 0
     size = len(expression)
+    if size == 0:
+        raise ValueError()
+
     while i < size:
         ch = expression[i]
 
@@ -117,7 +120,7 @@ def is_valid(tokens: list) -> bool:
 
         elif token in ['*', '/', '+', '-']:
             if not last_is_num:
-                if token in ['*', '/']:
+                if token != '-':
                     return False
 
             if not (i + 1 < size and (tokens[i + 1] == '(' or tokens[i + 1][0].isdigit())):
