@@ -5,8 +5,93 @@ def calculate(expression: str) -> float:
     tokens = get_tokens(expression)
     if not is_valid(tokens):
         raise ValueError()
+    
+    rpn_tokens = convert_to_rpn(tokens)
 
-    raise NotImplementedError()
+    return calculate_rpn(rpn_tokens)
+
+# rpn - это "Обратная Польская Нотация" 
+def convert_to_rpn(tokens: list) -> list:
+    output = []
+    operators = []
+
+    # Префикс 'u' означает, что операция унарная
+    precedence = {'+': 1, '-': 1, '*': 2, '/': 2, 'u-': 3}
+
+    i = 0
+    size = len(tokens)
+
+    while i < size:
+        token = tokens[i]
+
+        if token.replace('.', '').isdigit():
+            output.append(float(token))
+
+        elif token == '(':
+            operators.append(token)
+        
+        elif token == ')':
+            while operators and operators[-1] != '(':
+                output.append(operators.pop())
+            operators.pop()
+
+        elif token in ['+', '-', '*', '/']:
+            if token == '-' and (i == 0 or tokens[i - 1] in ['(', '+', '-', '*', '/']):
+                token = 'u-'
+            
+            while (operators and operators[-1] != '(' and 
+                   precedence.get(operators[-1], 0) >= precedence.get(token, 0)):
+                output.append(operators.pop())
+
+            operators.append(token)
+        
+        i += 1
+
+    while operators:
+        output.append(operators.pop())
+
+    return output
+
+# Вычисление обратной польской нотации
+def calculate_rpn(rpn_tokens: list) -> float:
+    stack = []
+
+    for token in rpn_tokens:
+        if isinstance(token, float):
+            stack.append(token)
+
+        elif token == 'u-':
+            if len(stack) < 1:
+                raise ValueError("Недостаточно операндов для унарной операции")
+            
+            operand = stack.pop()
+            stack.append(-operand)
+
+        else:
+            if len(stack) < 2:
+                raise ValueError("Недостаточно операндов для бинарной операции")
+            
+            right = stack.pop()
+            left = stack.pop()
+
+            if token == '+':
+                result = left + right
+            elif token == '-':
+                result = left - right
+            elif token == '*':
+                result = left * right
+            elif token == '/':
+                if right == 0:
+                    raise ValueError("Деление на ноль 0_0")
+                result = left / right
+
+            stack.append(result)
+
+    if len(stack) != 1:
+        raise ValueError("Некорректное выражение")
+    
+    return stack[0]
+
 
 # Токены: float, (, ), +, -, *, /
 def get_tokens(expression: str) -> list:
