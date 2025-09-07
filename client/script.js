@@ -27,7 +27,7 @@ function setupEventListeners() {
     const mathButtons = document.querySelectorAll('.mathButtons');
     mathButtons.forEach(button => {
         if (button.value === '=') {
-            //
+            button.addEventListener('click', handleEquals);
         } else {
             button.addEventListener('click', () => handleOperatorInput(button.value));
         }
@@ -117,4 +117,48 @@ function updateDisplay() {
 
 function isOperator(char) {
     return ['+', '-', '*', '/', 'x'].includes(char);
+}
+
+async function handleEquals() {
+    if (currentExpression === '') {
+        return;
+    }
+    
+    try {
+        const originalExpression = currentExpression;
+        displayElement.value = 'Calculating...';
+        
+        const response = await fetch('/calculate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `expression=${encodeURIComponent(originalExpression)}`
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const result = data.result;
+            currentExpression = result.toString();
+            lastResult = result;
+            updateDisplay();
+                
+        } else {
+            const errorText = await response.text();
+            displayElement.value = 'Error';
+            
+            setTimeout(() => {
+                currentExpression = originalExpression;
+                updateDisplay();
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error('Calculation error:', error);
+        displayElement.value = 'Error';
+        
+        setTimeout(() => {
+            updateDisplay();
+        }, 2000);
+    }
 }
