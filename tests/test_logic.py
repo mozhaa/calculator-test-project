@@ -1,14 +1,8 @@
 import unittest
 from pathlib import Path
 import importlib.util
+from server.logic import calculate
 
-logic_path = Path(__file__).parent.parent / 'server' / 'logic.py'
-
-spec = importlib.util.spec_from_file_location("logic_module", logic_path)
-logic_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(logic_module)
-
-calculate = logic_module.calculate
 
 class TestCalculation(unittest.TestCase):
     """Класс для проверки правильности счёта калькулятора"""
