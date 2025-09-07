@@ -1,14 +1,8 @@
 import unittest
 from pathlib import Path
 import importlib.util
+from server.logic import is_valid
 
-logic_path = Path(__file__).parent.parent / 'server' / 'logic.py'
-
-spec = importlib.util.spec_from_file_location("logic_module", logic_path)
-logic_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(logic_module)
-
-is_valid = logic_module.is_valid
 
 class TestValidator(unittest.TestCase):
     """Класс для проверки функции-валидатора"""
