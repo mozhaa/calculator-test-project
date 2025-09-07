@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, FastAPI, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -12,19 +12,32 @@ router = APIRouter()
 templates = Jinja2Templates(directory="client")
 
 
-@router.get("/")
+@router.get("/", response_class=HTMLResponse)
 async def read_calculator(request: Request) -> Any:
     return templates.TemplateResponse(request=request, name="index.html")
 
 
-@router.post("/calculate")
-async def calculate_expression(request: Request, expression: str) -> JSONResponse:
+history = []
+HISTORY_MAXSIZE = 50
+
+
+@router.post("/calculate", response_class=JSONResponse)
+async def calculate_expression(request: Request, expression: str) -> Any:
+    global history
+    history.append(expression)
+    history = history[len(history) - HISTORY_MAXSIZE:]
     try:
         return {"result": calculate(expression)}
     except ValueError:
-        return Response(content=f'"{expression}" is not a valid math expression', return_code=400)
+        return Response(content=f'"{expression}" is not a valid math expression', status_code=400)
     except NotImplementedError:
-        return Response(content="calculation is not yet implemented", return_code=501)
+        return Response(content="calculation is not yet implemented", status_code=501)
+
+
+@router.get("/history", response_class=JSONResponse)
+async def read_history(request: Request) -> Any:
+    global history
+    return history
 
 
 app = FastAPI()
