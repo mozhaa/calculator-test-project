@@ -81,6 +81,13 @@ fieldset{
     text-align: right;
 
     font-weight: 400;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    
+    direction: ltr;
+    text-overflow: clip;
 }
 
 #history-input {
