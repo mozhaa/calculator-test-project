@@ -18,6 +18,8 @@ function initializeCalculator() {
     
     setupEventListeners();
     clearDisplay();
+    // Load existing history from server
+    refreshHistoryFromServer();
 }
 
 function setupEventListeners() {
@@ -140,7 +142,7 @@ async function handleEquals() {
             currentExpression = result.toString();
             lastResult = result;
             updateDisplay();
-            addToHistory(originalExpression, result);
+            refreshHistoryFromServer();
                 
         } else {
             const errorText = await response.text();
@@ -162,9 +164,15 @@ async function handleEquals() {
     }
 }
 
-function addToHistory(expression, result) {
-    const historyEntry = `${expression} = ${result}\n`;
-    historyElement.value += historyEntry;
-    
-    historyElement.scrollTop = historyElement.scrollHeight;
+
+async function refreshHistoryFromServer() {
+    try {
+        const resp = await fetch('/history');
+        if (!resp.ok) return;
+        const items = await resp.json();
+        const list = Array.isArray(items) ? items.slice().reverse() : [];
+        historyElement.value = list.join('\n') + (list.length ? '\n' : '');
+        historyElement.scrollTop = historyElement.scrollHeight;
+    } catch (e) {
+    }
 }
