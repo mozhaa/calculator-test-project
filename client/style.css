@@ -107,6 +107,8 @@ fieldset{
     -webkit-user-select: none;
     touch-action: manipulation;
 
+    padding-left: 6px;
+
 }
 
 .buttons-container {
@@ -149,4 +151,17 @@ fieldset{
 .button.digits {
     background-color: #84d3b7;
 
+}
+
+#history-input {
+    background-color: white;
+}
+
+.history-line {
+    display: block;
+    cursor: pointer;
+}
+
+.history-line:hover {
+    background-color: #eee;
 }
