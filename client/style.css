@@ -150,3 +150,16 @@ fieldset{
     background-color: #84d3b7;
 
 }
+
+#history-input {
+    background-color: white;
+}
+
+.history-line {
+    display: block;
+    cursor: pointer;
+}
+
+.history-line:hover {
+    background-color: #eee;
+}

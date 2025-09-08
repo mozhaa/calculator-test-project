@@ -165,13 +165,28 @@ async function handleEquals() {
 }
 
 
+function bindHistoryLines() {
+    document.querySelectorAll('.history-line').forEach(line => {
+        line.addEventListener('click', function() {
+            currentExpression = this.innerHTML;
+            updateDisplay();
+        });
+    });
+}
+
+
 async function refreshHistoryFromServer() {
     try {
         const resp = await fetch('/history');
         if (!resp.ok) return;
         const items = await resp.json();
         const list = Array.isArray(items) ? items.slice().reverse() : [];
-        historyElement.value = list.join('\n') + (list.length ? '\n' : '');
+        let value = "";
+        list.forEach((expression) => {
+            value += `<span class="history-line">${expression}</span>`;
+        })
+        historyElement.innerHTML = value;
+        bindHistoryLines();
         historyElement.scrollTop = historyElement.scrollHeight;
     } catch (e) {
     }
