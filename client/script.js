@@ -18,7 +18,6 @@ function initializeCalculator() {
     
     setupEventListeners();
     clearDisplay();
-    // Load existing history from server
     refreshHistoryFromServer();
 }
 
@@ -64,7 +63,7 @@ function handleDigitInput(digit) {
         lastResult = null;
     }
     currentExpression += digit;
-    updateDisplay();
+    updateDisplay('right');
 }
 
 function handleOperatorInput(operator) {
@@ -79,12 +78,12 @@ function handleOperatorInput(operator) {
             currentExpression += backendOperator;
         }
     }
-    updateDisplay();
+    updateDisplay('right');
 }
 
 function handleBracketInput(bracket) {
     currentExpression += bracket;
-    updateDisplay();
+    updateDisplay('right');
 }
 
 function handleDotInput() {
@@ -97,26 +96,30 @@ function handleDotInput() {
         } else {
             currentExpression += '.';
         }
-        updateDisplay();
+        updateDisplay('right');
     }
 }
 
 function handleDelete() {
     if (currentExpression.length > 0) {
         currentExpression = currentExpression.slice(0, -1);
-        updateDisplay();
+        updateDisplay('right');
     }
 }
 
 function clearDisplay() {
     currentExpression = '';
     lastResult = null;
-    updateDisplay();
+    updateDisplay('right');
 }
 
-function updateDisplay() {
+function updateDisplay(scrollDirection = 'right') {
     displayElement.value = currentExpression;
-    displayElement.scrollLeft = displayElement.scrollWidth;
+    if (scrollDirection === 'left') {
+        displayElement.scrollLeft = 0;
+    } else {
+        displayElement.scrollLeft = displayElement.scrollWidth;
+    }
 }
 
 function isOperator(char) {
@@ -141,25 +144,27 @@ async function handleEquals() {
             const result = data.result;
             currentExpression = result.toString();
             lastResult = result;
-            updateDisplay();
+            updateDisplay('left');
             refreshHistoryFromServer();
                 
         } else {
             const errorText = await response.text();
-            displayElement.value = 'Error';
-            
+            displayElement.value = 'error';
+            displayElement.scrollLeft = 0;
+            refreshHistoryFromServer();
             setTimeout(() => {
                 currentExpression = originalExpression;
-                updateDisplay();
-            }, 2000);
+                updateDisplay('right');
+            }, 1000);
         }
         
     } catch (error) {
         console.error('Calculation error:', error);
-        displayElement.value = 'Error';
-        
+        displayElement.value = 'error';
+        displayElement.scrollLeft = 0;
         setTimeout(() => {
-            updateDisplay();
+            currentExpression = originalExpression;
+            updateDisplay('right');
         }, 2000);
     }
 }
@@ -168,7 +173,10 @@ async function handleEquals() {
 function bindHistoryLines() {
     document.querySelectorAll('.history-line').forEach(line => {
         line.addEventListener('click', function() {
-            currentExpression = this.innerHTML;
+            const full = this.innerHTML;
+            const eqIndex = full.indexOf('=');
+            const onlyExpression = eqIndex !== -1 ? full.slice(0, eqIndex).trim() : full;
+            currentExpression = onlyExpression;
             updateDisplay();
         });
     });
@@ -182,8 +190,11 @@ async function refreshHistoryFromServer() {
         const items = await resp.json();
         const list = Array.isArray(items) ? items.slice().reverse() : [];
         let value = "";
-        list.forEach((expression) => {
-            value += `<span class="history-line">${expression}</span>`;
+        list.forEach((expression, index) => {
+            value += `<span class=\"history-line\">${expression}</span>`;
+            if (index < list.length - 1) {
+                value += `<span class=\"history-separator\" style=\"pointer-events:none; user-select:none; display:block; color:#888;\">-------</span>`;
+            }
         })
         historyElement.innerHTML = value;
         bindHistoryLines();

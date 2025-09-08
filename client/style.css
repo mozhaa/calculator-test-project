@@ -107,6 +107,8 @@ fieldset{
     -webkit-user-select: none;
     touch-action: manipulation;
 
+    padding-left: 6px;
+
 }
 
 .buttons-container {
