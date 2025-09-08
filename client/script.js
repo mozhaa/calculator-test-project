@@ -128,12 +128,8 @@ async function handleEquals() {
         const originalExpression = currentExpression;
         displayElement.value = 'Calculating...';
         
-        const response = await fetch('/calculate', {
+        const response = await fetch(`/calculate?expression=${encodeURIComponent(originalExpression)}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `expression=${encodeURIComponent(originalExpression)}`
         });
         
         if (response.ok) {
