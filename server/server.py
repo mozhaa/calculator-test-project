@@ -1,10 +1,11 @@
 from typing import Any
 
 from fastapi import APIRouter, FastAPI, Request, Response
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from .db import commit, get_cursor
 from .logic import calculate
 
 router = APIRouter()
@@ -17,15 +18,13 @@ async def read_calculator(request: Request) -> Any:
     return templates.TemplateResponse(request=request, name="index.html")
 
 
-history = []
 HISTORY_MAXSIZE = 50
 
 
 @router.post("/calculate", response_class=JSONResponse)
 async def calculate_expression(request: Request, expression: str) -> Any:
-    global history
-    history.append(expression)
-    history = history[len(history) - HISTORY_MAXSIZE:]
+    get_cursor().execute("INSERT INTO request VALUES (?)", (expression,))
+    commit()
     try:
         return {"result": calculate(expression)}
     except ValueError:
@@ -36,8 +35,8 @@ async def calculate_expression(request: Request, expression: str) -> Any:
 
 @router.get("/history", response_class=JSONResponse)
 async def read_history(request: Request) -> Any:
-    global history
-    return history
+    result = get_cursor().execute("SELECT expression FROM request LIMIT ?", (HISTORY_MAXSIZE,))
+    return [row[0] for row in result.fetchall()]
 
 
 app = FastAPI()
