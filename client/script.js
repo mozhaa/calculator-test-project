@@ -1,6 +1,7 @@
 let displayElement = null;
 let currentExpression = '';
 let lastResult = null;
+let historyElement = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeCalculator();
@@ -8,8 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeCalculator() {
     displayElement = document.getElementById('display');
+    historyElement = document.getElementById('history-input');
     
-    if (!displayElement) {
+    if (!displayElement || !historyElement) {
         console.error('Required calculator elements not found');
         return;
     }
@@ -138,6 +140,7 @@ async function handleEquals() {
             currentExpression = result.toString();
             lastResult = result;
             updateDisplay();
+            addToHistory(originalExpression, result);
                 
         } else {
             const errorText = await response.text();
@@ -157,4 +160,11 @@ async function handleEquals() {
             updateDisplay();
         }, 2000);
     }
+}
+
+function addToHistory(expression, result) {
+    const historyEntry = `${expression} = ${result}\n`;
+    historyElement.value += historyEntry;
+    
+    historyElement.scrollTop = historyElement.scrollHeight;
 }
