@@ -18,9 +18,6 @@ async def read_calculator(request: Request) -> Any:
     return templates.TemplateResponse(request=request, name="index.html")
 
 
-HISTORY_MAXSIZE = 50
-
-
 @router.post("/calculate", response_class=JSONResponse)
 async def calculate_expression(request: Request, expression: str) -> Any:
     get_cursor().execute("INSERT INTO request VALUES (?)", (expression,))
@@ -35,7 +32,7 @@ async def calculate_expression(request: Request, expression: str) -> Any:
 
 @router.get("/history", response_class=JSONResponse)
 async def read_history(request: Request) -> Any:
-    result = get_cursor().execute("SELECT expression FROM request LIMIT ?", (HISTORY_MAXSIZE,))
+    result = get_cursor().execute("SELECT expression FROM request")
     return [row[0] for row in result.fetchall()]
 
 
