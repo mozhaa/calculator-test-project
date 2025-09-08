@@ -187,7 +187,7 @@ async function refreshHistoryFromServer() {
         })
         historyElement.innerHTML = value;
         bindHistoryLines();
-        historyElement.scrollTop = historyElement.scrollHeight;
+        historyElement.scrollTop = 0;
     } catch (e) {
     }
 }
